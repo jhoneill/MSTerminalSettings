@@ -136,15 +136,17 @@ function Set-MSTerminalProfile {
                     }
                 }
             }
+            if ($MakeDefault -and $PSCmdlet.ShouldProcess("$($_.name) $($_.guid)", "Make profile the default")) {
+                $settings.globals.defaultProfile = $TerminalProfile.guid
+                $ProfileReplaced = $true
+            }
 
             $Settings["profiles"] = @($Settings["profiles"] | ForEach-Object {
-                if($_.guid -eq $TerminalProfile['guid']) {
-                    if($PSCmdlet.ShouldProcess("$($_.name) $($_.guid)", "Replace profile")) {
+                if($_.guid -eq $TerminalProfile['guid'] -and $PSCmdlet.ShouldProcess("$($_.name) $($_.guid)", "Replace profile")) {
                         $TerminalProfile
                         Write-Debug (ConvertTo-Json $TerminalProfile)
                         [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "ProfileReplaced")]
                         $ProfileReplaced = $true
-                    }
                 } else {
                     $_
                 }
