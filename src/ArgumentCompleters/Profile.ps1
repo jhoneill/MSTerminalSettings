@@ -19,4 +19,4 @@ $ProfileCompleter = {
         )
     }
 }
-Register-ArgumentCompleter -ParameterName Name -CommandName "Get-MSTerminalProfile","Remove-MSTerminalProfile","Set-MSTerminalProfile" -ScriptBlock $ProfileCompleter
+Register-ArgumentCompleter -ParameterName Name -CommandName "Get-MSTerminalProfile","Remove-MSTerminalProfile","Set-MSTerminalProfile","Split-Shell" -ScriptBlock $ProfileCompleter
