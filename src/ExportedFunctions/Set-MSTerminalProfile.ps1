@@ -59,8 +59,15 @@ function Set-MSTerminalProfile {
         [AllowNull()]
         [String]$BackgroundImageStretchMode,
 
+        [switch]$Hidden,
+
         [ValidateSet("visible","hidden")]
         [string]$ScrollbarState,
+
+        [ValidateSet("Windows.Terminal.Azure","Windows.Terminal.PowershellCore","Windows.Terminal.Wsl","")]
+        [string]$Source,
+
+        [guid]$NewGuid,
 
         [string]$TabTitle,
 
@@ -109,6 +116,7 @@ function Set-MSTerminalProfile {
                 "cursorColor",
                 "cursorShape",
                 "cursorHeight",
+                "hidden",
                 "historySize",
                 "fontFace",
                 "fontSize",
@@ -118,6 +126,7 @@ function Set-MSTerminalProfile {
                 "tabTitle",
                 "acrylicOpacity",
                 "snapOnInput",
+                "source",
                 "startingDirectory",
                 "useAcrylic",
                 "icon"
@@ -141,10 +150,6 @@ function Set-MSTerminalProfile {
                     }
                 }
             }
-            if ($MakeDefault -and $PSCmdlet.ShouldProcess("$($_.name) $($_.guid)", "Make profile the default")) {
-                $settings.globals.defaultProfile = $TerminalProfile.guid
-                $ProfileReplaced = $true
-            }
 
             if($MakeDefault -and $PSCmdlet.ShouldProcess($TerminalProfile['name'], "Set default profile")) {
                 $Global.defaultProfile = $TerminalProfile['guid']
@@ -152,12 +157,19 @@ function Set-MSTerminalProfile {
                 $ProfileReplaced = $true
             }
 
+            $OldGuid = $TerminalProfile['guid']
+            if($NewGuid) {
+                $TerminalProfile['guid'] = "{$NewGuid}"
+            }
+
             $Settings["profiles"] = @($Settings["profiles"] | ForEach-Object {
-                if($_.guid -eq $TerminalProfile['guid'] -and $PSCmdlet.ShouldProcess("$($_.name) $($_.guid)", "Replace profile")) {
+                if($_.guid -eq $OldGuid) {
+                    if($PSCmdlet.ShouldProcess("$($_.name) $($_.guid)", "Replace profile")) {
                         $TerminalProfile
                         Write-Debug (ConvertTo-Json $TerminalProfile)
                         [Diagnostics.CodeAnalysis.SuppressMessageAttribute("PSUseDeclaredVarsMoreThanAssignment", "ProfileReplaced")]
                         $ProfileReplaced = $true
+                    }
                 } else {
                     $_
                 }
